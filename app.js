@@ -1,0 +1,118 @@
+const express = require('express');
+const mongoose = require('mongoose')
+const Blog = require('./models/blog')
+const authRoutes = require('./routes/authroutes')
+const cookie = require('cookie-parser')
+const {requireAuth, checkUser} = require('./middlewares/authmiddleware')
+
+const app = express();
+
+app.set('view engine', 'ejs');
+
+app.use(express.static('public'));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(cookie())
+
+//connecting to mongodb
+const dbURI = 'mongodb+srv://Oyishoma:M45t3r13c3@mydb.qmshoek.mongodb.net/bloghaven';
+mongoose.connect(dbURI)
+  .then((result)=> app.listen(3000))
+  .catch((err)=>{console.log(err)})
+
+
+// routes
+app.use(checkUser)
+
+app.get('/', (req, res) => {
+  res.redirect('/landing')
+});
+
+app.get('/index', requireAuth, (req, res) => {
+  res.redirect('/blogs');
+}); 
+
+app.get('/landing', (req, res) => {
+  res.render('landing', {title : "Welcome"});
+}); 
+
+app.get('/about', requireAuth, (req, res) => {
+  res.render('about', {title : "About"});
+});
+
+app.get('/contact', requireAuth,(req, res) => {
+  res.render('contact', {title : "Contact"});
+});
+
+
+app.get('/blogs', requireAuth, async (req, res)=> {
+  Blog.find().sort({createdAt: -1}).populate('author')
+  .then((result)=>{
+    res.render('index', {title: "All Blogs", blogs: result })
+  })
+  .catch((err)=>console.log(err))
+})
+
+app.post('/blogs', requireAuth, async (req,res)=>{
+  const blog = new Blog({
+    ...req.body,
+    tags: req.body.tags ? req.body.tags.split(',').map(tag => tag.trim().toLowerCase()) : [],
+    author: res.locals.user._id
+  })
+  await blog.save()
+    .then((result)=>{
+      res.redirect('/blogs')
+    })
+    .catch((err)=>console.log(err))
+    res.status(400).send('Error creating blog')
+})
+
+
+app.get('/blogs/:id', requireAuth, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const blog = await Blog.findById(id).populate('author');
+    if (!blog) {
+      return res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [] });
+    }
+    const similarBlogs = await Blog.findSimilar(blog.tags, blog._id);
+    res.render('details', { blog, title: 'Blog Details', similarBlogs });
+  } catch (err) {
+    res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [] });
+  }
+});
+
+
+//similar posts route
+app.get('/blogs/:id/similar', requireAuth, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: 'Blog not found' });
+
+    const similarBlogs = await Blog.findSimilar(blog.tags, blog._id);
+    res.render('similar', { title: 'Similar Posts', blogs: similarBlogs });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete('/blogs/:id', (req, res)=>{
+  const id = req.params.id
+
+  Blog.findByIdAndDelete(id)
+    .then(result => {
+      res.json({redirect: '/blogs'})
+    })
+    .catch(err => console.log(err))
+})
+
+app.get('/new-post', requireAuth, (req, res) => {
+  res.render('new-post', {title : "New Post"});
+});
+
+app.use(authRoutes)
+
+app.use((req, res) => {
+  res.status(404).render('404');
+});
+

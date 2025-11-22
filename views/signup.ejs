@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="signup-container">
+    <h2>Sign Up</h2>
+    <form action="/signup" method="POST">
+      <label for="firstname">First Name:</label>
+      <input type="text" id="firstname" name="firstname" required>
+      <label for="lastname">Last Name:</label>
+      <input type="text" id="lastname" name="lastname" required>  
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required>
+      <div class="email-error"></div>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <div class="password-error"></div>
+      <button type="submit">Sign Up</button>
+    </form>
+    <div class="links">
+      <a href="/forgot-password">Forgot password?</a>
+      <span>Already have an account? <a href="/login">Login</a></span>
+    </div>
+  </div>
+
+<script>
+  const form = document.querySelector('form')
+  const emailError = document.querySelector('.email-error')
+  const passwordError = document.querySelector('.password-error')
+  
+  form.addEventListener('submit', async(e) => {
+    e.preventDefault()
+
+    //reset error fields
+    emailError.textContent = ''
+    passwordError.textContent = ''
+
+    //get values from the form
+    const firstname = form.firstname.value
+    const lastname = form.lastname.value
+    const email = form.email.value
+    const password = form.password.value
+
+    try{
+      const res = await fetch('/signup', {
+        method: 'POST', 
+        body: JSON.stringify({firstname, lastname, email, password}),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      const data = await res.json()
+      console.log(data)
+
+      if(data.errors){
+        emailError.textContent = data.errors.email
+        passwordError.textContent = data.errors.password
+      }
+      if(data.user){
+        location.assign('/blogs')
+      }
+    }catch{
+      console.log(err)
+    }
+  })
+</script>
+</body>
+</html>

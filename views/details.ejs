@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+<body>
+  <div class="page-wrapper">
+    <div class="details-layout container">
+      <!-- Blog Post (Left) -->
+      <div class="details content" >
+        <h2><%= blog.title %></h2>
+        <div class="content">
+          <p> <%- blog.body %> </p>
+        </div>
+        <a href="" class="delete" data-doc="<%= blog._id %>">Delete</a>
+      </div>
+
+      <!-- Similar Posts (Right) -->
+      <aside class="similar-posts">
+        <h3>Similar Posts</h3>
+        <% if (similarBlogs && similarBlogs.length > 0) { %>
+          <ul>
+            <% similarBlogs.forEach(function(similar){ %>
+              <li>
+                <a href="/blogs/<%= similar._id %>"><%= similar.title %></a>
+                <br>
+                <small>Tags: <%= similar.tags.join(', ') %></small>
+              </li>
+            <% }) %>
+          </ul>
+        <% } else { %>
+          <p>No similar posts found.</p>
+        <% } %>
+      </aside>
+    </div>
+    <%- include('partials/footer') %>
+    <script>
+      const trash = document.querySelector('a.delete')
+      trash.addEventListener('click', (e) => {
+        e.preventDefault();
+        const endpoint = `/blogs/${trash.dataset.doc}`
+        fetch(endpoint, {
+          method: 'DELETE'
+        })
+        .then((response) => response.json())
+        .then((data) => window.location.href = data.redirect)
+        .catch(console.log)
+      })
+    </script>
+  </div>
+</body>
+</html>

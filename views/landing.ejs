@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog Haven</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      height: 100%;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      padding: 2rem 5rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    header h2 {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #1c1c1c;
+    }
+
+    nav a {
+      margin-left: 2rem;
+      text-decoration: none;
+      font-weight: 500;
+      color: #1c1c1c;
+    }
+
+    nav a:hover {
+      color: #ff5733;
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .hero-text {
+      flex: 1;
+    }
+
+    .hero-text h1 {
+      font-size: 5.5rem;
+      font-weight: 800;
+      color: #1c1c1c;
+      margin-bottom: 1rem;
+    }
+
+    .hero-text p {
+      font-size: 1rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      background: linear-gradient(90deg, #fcd453 0%, #f88869 100%);
+      color: #fff;
+      padding: 0.9rem 2rem;
+      border-radius: 50px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: linear-gradient(90deg, #fda085 0%, #f6d365 100%);
+    }
+
+    /* Hero Illustration */
+    .hero-illustration {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hero-illustration img {
+      width: 700px;
+      height: 500px;
+
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>BLOG HAVEN</h1>
+      <nav>
+        <a href="/login">Login</a>
+      <a href="/signup">Sign Up</a>
+        <a href="/contact">Contact</a>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Discover Amazing Articles</h1>
+        <p>Explore different topics and find inspiration</p>
+        <a href="#" class="btn">Get Started</a>
+      </div>
+      <div class="hero-illustration">
+        <!-- Replace with your SVG or image -->
+        <img src="illustration.png" alt="Illustration">
+      </div>
+    </section>
+  </div>
+</body>
+</html>

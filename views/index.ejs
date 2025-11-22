@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+<body>
+  <div class="page-wrapper">
+    <section class="welcome-banner">
+    <span class="emoji">👋</span>
+    <div>
+      <h2>
+        Welcome back, <%= user && user.firstname ? user.firstname : 'Guest' %>!
+      </h2>
+      <p>Ready to discover amazing articles today?</p>
+    </div>
+    <div class="banner-logout-div">
+        <button type="submit" class="logout-btn">
+          <a href="/logout">Logout</a>
+        </button>
+    </div>
+  </section>
+
+  <div class="div container">
+  <!-- Blog cards -->
+  <div class="blog-body">
+      <h2 class="all-blogs">All Blogs</h2>
+      <div class="blogs-grid">
+        <% if(blogs.length > 0) { %>
+          <% blogs.forEach(blog =>{ %>
+            <a href="/blogs/<%= blog._id %>" class="single">
+              <h3 class="blog-title"><%= blog.title %></h3>
+              <p class="blog-snippet"><%= blog.snippet %></p>
+              <p>By: <%= blog.author 
+                && blog.author.firstname 
+                && blog.author.lastname 
+                ? blog.author.firstname + ' ' + blog.author.lastname 
+                : 'Unknown' %>
+              </p>
+            </a>
+          <% }) %>
+        <% }else { %>
+          <p class="no-blog">No blog post yet</p>
+        <% } %>
+      </div>     
+    </div> 
+  </div>
+  <%- include('partials/footer') %>
+  </div> 
+  
+  
+</body>
+</html>

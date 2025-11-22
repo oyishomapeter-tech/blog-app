@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+<body>
+  <div class="new-post-container">
+    <div class="new-post-form">
+    <h1>Create a New Post</h1>
+    <form class="new-post-form" action="/blogs" method="POST">
+    <label class="label" for="title">Title:</label>
+    <input class="input" type="text" id="title" name="title" required>
+    <br>
+    <label class="label" for="title">Snippet:</label>
+    <input class="input" type="text" id="snippet" name="snippet" required>
+    <br>
+    <label class="label" for="content">Content:</label>
+    <div id="editor" style="height:200px;"></div>
+    <input type="hidden" name="body" id="body">
+    <br>
+    <label for="tags">Tags (comma separated):</label>
+    <input type="text" name="tags" placeholder="e.g. javascript, nodejs, web">
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+</div>
+  </div>
+  <%- include('partials/footer') %>
+
+  <script>
+  var quill = new Quill('#editor', { 
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        // Font & size
+        [{ font: [] }],
+        [{ size: ['small', false, 'large', 'huge'] }], // default, small, large, huge
+        
+        // Text styles
+        ['bold', 'italic', 'underline', 'strike'],
+        
+        // Blocks
+        ['blockquote', 'code-block'],
+        
+        // Lists
+        [{ list: 'ordered' }, { list: 'bullet' }, { list: 'check' }],
+        
+        // Indent
+        [{ indent: '-1' }, { indent: '+1' }],
+        
+        // Script (sub/super)
+        [{ script: 'sub' }, { script: 'super' }],
+        
+        // Alignment & direction
+        [{ align: [] }],
+        [{ direction: 'rtl' }],
+        
+        // Color & Background
+        [{ color: [] }, { background: [] }],
+        
+        // Links & Media
+        ['link', 'image', 'video'],
+        
+        // Clean formatting
+        ['clean'] 
+      ]
+    }
+  });
+  document.querySelector('form').onsubmit = function() {
+    document.querySelector('#body').value = quill.root.innerHTML;
+    };
+  </script>
+</body>
+</html>
