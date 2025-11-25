@@ -46,11 +46,24 @@ app.get('/contact', requireAuth,(req, res) => {
 
 
 app.get('/blogs', requireAuth, async (req, res)=> {
-  Blog.find().sort({createdAt: -1}).populate('author')
-  .then((result)=>{
-    res.render('index', {title: "All Blogs", blogs: result })
-  })
-  .catch((err)=>console.log(err))
+  try {
+    const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+    const limit = 4; // items per page
+    const skip = (page - 1) * limit;
+
+    const [totalCount, blogs, trendingBlogs] = await Promise.all([
+      Blog.countDocuments({}),
+      Blog.find().sort({createdAt: -1}).skip(skip).limit(limit).populate('author'),
+      Blog.find().sort({createdAt: -1}).limit(5).populate('author')
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+
+  res.render('index', { title: 'All Blogs', blogs, currentPage: page, totalPages, trendingBlogs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('index', { title: 'All Blogs', blogs: [], currentPage: 1, totalPages: 1 });
+  }
 })
 
 app.post('/blogs', requireAuth, async (req,res)=>{

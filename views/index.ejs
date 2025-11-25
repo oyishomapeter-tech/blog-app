@@ -20,6 +20,7 @@
           </button>
       </div>
     </section>
+    </section>
 
     <script>
       // Show the welcome banner briefly when redirected after login.
@@ -129,6 +130,15 @@
     </div>
   </div>
   
+  <!-- Server-side pagination controls -->
+    <nav class="pagination" aria-label="Pagination">
+      <% if (typeof currentPage !== 'undefined' && currentPage > 1) { %>
+        <a href="/blogs?page=<%= currentPage - 1 %>" class="page-btn prev">Previous</a>
+      <% } %>
+      <% if (typeof currentPage !== 'undefined' && typeof totalPages !== 'undefined' && currentPage < totalPages) { %>
+        <a href="/blogs?page=<%= currentPage + 1 %>" class="page-btn next">View more</a>
+      <% } %>
+    </nav>
   <%- include('partials/footer') %>
   </div> 
   
