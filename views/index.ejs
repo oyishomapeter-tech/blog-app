@@ -3,45 +3,132 @@
 <%- include('partials/header') %>
 <body>
   <div class="page-wrapper">
-    <section class="welcome-banner">
-    <span class="emoji">👋</span>
-    <div>
-      <h2>
-        Welcome back, <%= user && user.firstname ? user.firstname : 'Guest' %>!
-      </h2>
-      <p>Ready to discover amazing articles today?</p>
-    </div>
-    <div class="banner-logout-div">
-        <button type="submit" class="logout-btn">
-          <a href="/logout">Logout</a>
-        </button>
-    </div>
-  </section>
+    <!-- Welcome banner: hidden by default. Will flash briefly after login when ?welcome=1 is present
+         or when sessionStorage.showWelcome === '1' (so server can set that via a small script on login page).
+    -->
+    <section id="welcome-banner" class="welcome-banner hidden">
+      <span class="emoji">👋</span>
+      <div>
+        <h2>
+          Welcome back, <%= user && user.firstname ? user.firstname : 'Guest' %>!
+        </h2>
+        <p>Ready to discover amazing articles today?</p>
+      </div>
+      <div class="banner-logout-div">
+          <button type="submit" class="logout-btn">
+            <a href="/logout">Logout</a>
+          </button>
+      </div>
+    </section>
 
-  <div class="div container">
+    <script>
+      // Show the welcome banner briefly when redirected after login.
+      (function(){
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var show = params.get('welcome') === '1' || sessionStorage.getItem('showWelcome') === '1';
+          if (show) {
+            var banner = document.getElementById('welcome-banner');
+            if (banner) {
+              // show with animation class
+              banner.classList.remove('hidden');
+              banner.classList.add('flash');
+              // clear the session flag so it only shows once
+              sessionStorage.removeItem('showWelcome');
+              // remove the welcome query param from URL (clean URL)
+              if (params.has('welcome')) {
+                params.delete('welcome');
+                var newUrl = window.location.pathname + (params.toString() ? ('?' + params.toString()) : '') + window.location.hash;
+                window.history.replaceState({}, document.title, newUrl);
+              }
+              // hide after animation duration (4s) + small buffer
+              setTimeout(function(){
+                banner.classList.remove('flash');
+                banner.classList.add('hidden');
+              }, 4200);
+            }
+          }
+        } catch (e) {
+          // fail silently
+          console.error(e);
+        }
+      })();
+    </script>
+
+<div class="main-content">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <!-- Categories Section -->
+        <div class="sidebar-section categories-section">
+          <h3>Categories</h3>
+          <ul class="categories-list">
+            <li><a href="/blogs?category=technology">Technology</a></li>
+            <li><a href="/blogs?category=lifestyle">Lifestyle</a></li>
+            <li><a href="/blogs?category=business">Business</a></li>
+            <li><a href="/blogs?category=health">Health</a></li>
+            <li><a href="/blogs?category=travel">Travel</a></li>
+            <li><a href="/blogs?category=other">Other</a></li>
+          </ul>
+        </div>
+
+        <!-- Trending Posts Section -->
+        <div class="sidebar-section trending-section">
+          <h3>Trending Posts</h3>
+          <% if(blogs && blogs.length > 0) { %>
+            <ul class="trending-list">
+              <% blogs.slice(0, 5).forEach(blog => { %>
+                <li class="trending-item">
+                  <a href="/blogs/<%= blog._id %>" class="trending-link">
+                    <span class="trending-title"><%= blog.title %></span>
+                    <span class="trending-author">By <%= blog.author && blog.author.firstname ? blog.author.firstname : 'Unknown' %></span>
+                  </a>
+                </li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <p class="no-trending">No trending posts yet</p>
+          <% } %>
+        </div>
+      </aside>
+  
   <!-- Blog cards -->
   <div class="blog-body">
       <h2 class="all-blogs">All Blogs</h2>
       <div class="blogs-grid">
         <% if(blogs.length > 0) { %>
           <% blogs.forEach(blog =>{ %>
+            <% let _img = null;
+               if (blog.imageUrl) { _img = blog.imageUrl; }
+               else if (blog.body) {
+                 var m = blog.body.match(/<img[^>]+src=["']([^"']+)["']/i);
+                 if (m) _img = m[1];
+               }
+            %>
             <a href="/blogs/<%= blog._id %>" class="single">
-              <h3 class="blog-title"><%= blog.title %></h3>
-              <p class="blog-snippet"><%= blog.snippet %></p>
-              <p>By: <%= blog.author 
-                && blog.author.firstname 
-                && blog.author.lastname 
-                ? blog.author.firstname + ' ' + blog.author.lastname 
-                : 'Unknown' %>
-              </p>
+              <% if(_img) { %>
+                <div class="card-image">
+                  <img src="<%= _img %>" alt="<%= blog.title %>">
+                </div>
+              <% } %>
+              <div class="card-content">
+                <h3 class="blog-title"><%= blog.title %></h3>
+                <p class="blog-snippet"><%= blog.snippet %></p>
+                <p class="blog-meta">By: <%= blog.author 
+                  && blog.author.firstname 
+                  && blog.author.lastname 
+                  ? blog.author.firstname + ' ' + blog.author.lastname 
+                  : 'Unknown' %>
+                </p>
+              </div>
             </a>
           <% }) %>
         <% }else { %>
           <p class="no-blog">No blog post yet</p>
         <% } %>
       </div>     
-    </div> 
+    </div>
   </div>
+  
   <%- include('partials/footer') %>
   </div> 
   

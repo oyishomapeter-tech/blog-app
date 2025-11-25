@@ -56,6 +56,8 @@
         passwordError.textContent = data.errors.password
       }
       if(data.user){
+        // set a session flag so the welcome banner on /blogs can flash once
+        try { sessionStorage.setItem('showWelcome', '1') } catch(e) {}
         location.assign('/blogs')
       }
     }catch{
