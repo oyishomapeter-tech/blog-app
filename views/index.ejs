@@ -94,7 +94,28 @@
   
   <!-- Blog cards -->
   <div class="blog-body">
-      <h2 class="all-blogs">All Blogs</h2>
+      <div class="blogs-toolbar">
+        
+        <div class="search-wrapper">
+          <h2 class="all-blogs">All Blogs</h2>
+          <form action="/blogs" method="get" class="search-form" role="search" aria-label="Search blogs">
+            <input
+              type="text"
+              name="q"
+              class="search-input"
+              placeholder="Search articles, tags or authors..."
+              value="<%= typeof q !== 'undefined' ? q : '' %>"
+              aria-label="Search blogs"
+            />
+            <button type="submit" class="search-btn" aria-label="Submit search">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M21 21l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="11" cy="11" r="6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
       <div class="blogs-grid">
         <% if(blogs.length > 0) { %>
           <% blogs.forEach(blog =>{ %>

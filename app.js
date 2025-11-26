@@ -1,9 +1,11 @@
-const express = require('express');
+const express = require('express')
+require('dotenv').config()
 const mongoose = require('mongoose')
 const Blog = require('./models/blog')
 const authRoutes = require('./routes/authroutes')
 const cookie = require('cookie-parser')
 const {requireAuth, checkUser} = require('./middlewares/authmiddleware')
+
 
 const app = express();
 
@@ -14,8 +16,10 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookie())
 
-//connecting to mongodb
-const dbURI = 'mongodb+srv://Oyishoma:M45t3r13c3@mydb.qmshoek.mongodb.net/bloghaven';
+// //connecting to mongodb
+
+const dbURI = process.env.DB_URI;
+
 mongoose.connect(dbURI)
   .then((result)=> app.listen(3000))
   .catch((err)=>{console.log(err)})
@@ -50,19 +54,34 @@ app.get('/blogs', requireAuth, async (req, res)=> {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = 4; // items per page
     const skip = (page - 1) * limit;
+    const q = (req.query.q || '').trim();
+
+    // build search filter
+    const filter = {};
+    if (q) {
+      // escape special regex characters
+      const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(escapeRegex(q), 'i');
+      filter.$or = [
+        { title: regex },
+        { snippet: regex },
+        { body: regex },
+        { tags: q.toLowerCase() }
+      ];
+    }
 
     const [totalCount, blogs, trendingBlogs] = await Promise.all([
-      Blog.countDocuments({}),
-      Blog.find().sort({createdAt: -1}).skip(skip).limit(limit).populate('author'),
+      Blog.countDocuments(filter),
+      Blog.find(filter).sort({createdAt: -1}).skip(skip).limit(limit).populate('author'),
       Blog.find().sort({createdAt: -1}).limit(5).populate('author')
     ]);
 
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
 
-  res.render('index', { title: 'All Blogs', blogs, currentPage: page, totalPages, trendingBlogs });
+  res.render('index', { title: 'All Blogs', blogs, currentPage: page, totalPages, trendingBlogs, q });
   } catch (err) {
     console.error(err);
-    res.status(500).render('index', { title: 'All Blogs', blogs: [], currentPage: 1, totalPages: 1 });
+    res.status(500).render('index', { title: 'All Blogs', blogs: [], currentPage: 1, totalPages: 1, q: '' });
   }
 })
 
