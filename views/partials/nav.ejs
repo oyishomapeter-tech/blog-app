@@ -6,5 +6,57 @@
       <li><a href="/contact">Contact</a></li>
       <li><a href="/new-post">New Post</a></li>
     </ul>
-  </nav>
+    <div class="profile-dropdown-container">
+    <button class="profile-btn" id="profileBtn" aria-label="Profile menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="profile-menu" id="profileMenu" aria-hidden="true">
+      <% if (user && user.firstname) { %>
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <%= (user.firstname.charAt(0) + (user.lastname ? user.lastname.charAt(0) : '')).toUpperCase() %>
+          </div>
+          <div class="profile-info">
+            <p class="profile-name"><%= user.firstname %> <%= user.lastname || '' %></p>
+            <p class="profile-email"><%= user.email %></p>
+          </div>
+        </div>
+      <% } %>
+      
+      <ul class="profile-menu-items">
+        <li><a href="/profile" class="profile-link">My Profile</a></li>
+        <li><a href="/new-post">Create Post</a></li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/logout" class="logout-link">Logout</a></li>
+      </ul>
+    </div>
   </div>
+  </nav>
+
+  <!-- Profile Dropdown -->
+  
+</div>
+
+<script>
+  const profileBtn = document.getElementById('profileBtn');
+  const profileMenu = document.getElementById('profileMenu');
+
+  profileBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = profileMenu.getAttribute('aria-hidden') === 'false';
+    profileMenu.setAttribute('aria-hidden', String(!isOpen));
+    profileBtn.setAttribute('aria-expanded', String(!isOpen));
+    profileMenu.classList.toggle('active');
+  });
+
+  // close menu when clicking outside
+  document.addEventListener('click', () => {
+    profileMenu.setAttribute('aria-hidden', 'true');
+    profileBtn.setAttribute('aria-expanded', 'false');
+    profileMenu.classList.remove('active');
+  });
+</script>

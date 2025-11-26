@@ -142,6 +142,17 @@ app.get('/new-post', requireAuth, (req, res) => {
   res.render('new-post', {title : "New Post"});
 });
 
+app.get('/profile', requireAuth, async (req, res) => {
+  try {
+    const userId = res.locals.user._id;
+    const userBlogs = await Blog.find({ author: userId }).sort({ createdAt: -1 }).populate('author');
+    res.render('profile', { title: 'My Profile', blogs: userBlogs });
+  } catch (err) {
+    console.error(err);
+    res.status(500).render('profile', { title: 'My Profile', blogs: [] });
+  }
+});
+
 app.use(authRoutes)
 
 app.use((req, res) => {

@@ -264,7 +264,7 @@ nav {
   background: transparent;
   box-shadow: none;
   margin-bottom: 0;
-  padding-top: 30px;
+  padding-top: 5px;
   padding-right: 2rem;
   height: 100%;
   display: flex;
@@ -312,6 +312,156 @@ nav ul li a {
 nav ul li a:hover {
   color: #6a11cb;
    transform: scale(1.5);
+}
+
+/* Profile Dropdown */
+.navigation-div {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.profile-dropdown-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.profile-btn {
+  background: linear-gradient(135deg, #6b8cff, #6ad1ff);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(106, 161, 255, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 6px 18px rgba(106, 161, 255, 0.24);
+}
+
+.profile-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  min-width: 280px;
+  margin-top: 0.8rem;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  z-index: 1000;
+}
+
+.profile-menu.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6b8cff, #6ad1ff);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.profile-name {
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-email {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 0;
+}
+
+.profile-menu-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-menu-items li {
+  margin: 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.profile-menu-items li:last-child {
+  border-bottom: none;
+}
+
+.profile-menu-items a {
+  display: block;
+  padding: 0.75rem 1rem;
+  color: #222;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.profile-menu-items a:hover {
+  background: #f8f9fa;
+  color: #6b8cff;
+}
+
+.logout-link {
+  color: #e74c3c !important;
+}
+
+.logout-link:hover {
+  background: #ffe5e0 !important;
 }
 
 /* Welcome Banner */
@@ -667,6 +817,7 @@ Responsive Design
   justify-content: center;
   margin: 1.8rem auto 2.4rem auto;
   flex-wrap: wrap;
+  background-color: #ffff;
   width: 100%;
   max-width: 1100px; /* keep controls from stretching too wide */
   padding: 0 1rem; /* small horizontal padding on narrow screens */
@@ -1110,6 +1261,264 @@ Responsive Design
   color: #fff;
 }
 
+/* ===== Profile Page Styles ===== */
+.profile-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.profile-header-section {
+  margin-bottom: 3rem;
+}
+
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.profile-avatar-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6b8cff, #6ad1ff);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 2rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(106, 161, 255, 0.24);
+}
+
+.profile-details {
+  flex: 1;
+}
+
+.profile-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 0.3rem 0;
+}
+
+.profile-email-display {
+  font-size: 0.95rem;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+}
+
+.profile-member-since {
+  font-size: 0.85rem;
+  color: #999;
+  margin: 0;
+  font-style: italic;
+}
+
+.btn-create-post {
+  background: linear-gradient(90deg, #6b8cff, #6ad1ff);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 6px 18px rgba(106, 161, 255, 0.18);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-create-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(106, 161, 255, 0.24);
+}
+
+.profile-posts-section {
+  margin-top: 2rem;
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 1.5rem 0;
+}
+
+.profile-blogs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.profile-blog-card {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-blog-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+}
+
+.profile-card-image {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.profile-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-card-content {
+  padding: 1.2rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-blog-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.profile-blog-snippet {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
+
+.profile-blog-date {
+  font-size: 0.8rem;
+  color: #999;
+  margin: 0;
+}
+
+.profile-card-actions {
+  display: flex;
+  gap: 0.6rem;
+  padding: 1rem 1.2rem 0 1.2rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.btn-view, .btn-edit, .btn-delete {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.btn-view {
+  background: #e7f1ff;
+  color: #007bff;
+}
+
+.btn-view:hover {
+  background: #d0e3ff;
+}
+
+.btn-edit {
+  background: #e8f5e9;
+  color: #4caf50;
+}
+
+.btn-edit:hover {
+  background: #c8e6c9;
+}
+
+.btn-delete {
+  background: #ffebee;
+  color: #f44336;
+}
+
+.btn-delete:hover {
+  background: #ffcdd2;
+}
+
+.no-posts-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.no-posts-message p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0 0 1rem 0;
+}
+
+.btn-create-post-secondary {
+  display: inline-block;
+  background: linear-gradient(90deg, #6b8cff, #6ad1ff);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(106, 161, 255, 0.18);
+}
+
+.btn-create-post-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(106, 161, 255, 0.24);
+}
+
+@media (max-width: 768px) {
+  .profile-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-blogs-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-create-post {
+    width: 100%;
+  }
+}
+
 /* ===== Final card overrides (placed last to ensure they win) ===== */
 .blogs-grid {
   display: grid;
@@ -1197,8 +1606,8 @@ nav ul li a {
 .search-wrapper {
   flex: 2 1 auto;
   display: flex;
-  margin-top: 20px;
-  justify-content: flex-end;
+  margin-top: 10px;
+  justify-content: center;
 }
 
 .search-form {
@@ -1255,6 +1664,6 @@ nav ul li a {
 
 @media (max-width: 768px) {
   .blogs-toolbar { flex-direction: column; align-items: stretch; gap: 0.6rem; padding: 0 1rem; }
-  .search-wrapper { justify-content: stretch; }
+  .search-wrapper { justify-content: center; }
   .search-form { max-width: 100%; }
 }

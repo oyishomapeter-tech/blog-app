@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+<body>
+  <div class="page-wrapper">
+    <div class="profile-container">
+      <!-- Profile Header Section -->
+      <div class="profile-header-section">
+        <div class="profile-card">
+          <div class="profile-avatar-large">
+            <%= (user.firstname.charAt(0) + (user.lastname ? user.lastname.charAt(0) : '')).toUpperCase() %>
+          </div>
+          <div class="profile-details">
+            <h1 class="profile-title"><%= user.firstname %> <%= user.lastname || '' %></h1>
+            <p class="profile-email-display"><%= user.email %></p>
+            <p class="profile-member-since">Member since <%= new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) %></p>
+          </div>
+          <a href="/new-post" class="btn-create-post">Create New Post</a>
+        </div>
+      </div>
+
+      <!-- My Posts Section -->
+      <div class="profile-posts-section">
+        <h2 class="section-title">My Posts</h2>
+        
+        <% if (blogs && blogs.length > 0) { %>
+          <div class="profile-blogs-grid">
+            <% blogs.forEach(blog => { %>
+              <% let _img = null;
+                 if (blog.imageUrl) { _img = blog.imageUrl; }
+                 else if (blog.body) {
+                   var m = blog.body.match(/<img[^>]+src=["']([^"']+)["']/i);
+                   if (m) _img = m[1];
+                 }
+              %>
+              <div class="profile-blog-card">
+                <% if (_img) { %>
+                  <div class="profile-card-image">
+                    <img src="<%= _img %>" alt="<%= blog.title %>">
+                  </div>
+                <% } %>
+                <div class="profile-card-content">
+                  <h3 class="profile-blog-title"><%= blog.title %></h3>
+                  <p class="profile-blog-snippet"><%= blog.snippet %></p>
+                  <p class="profile-blog-date"><%= new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></p>
+                </div>
+                <div class="profile-card-actions">
+                  <a href="/blogs/<%= blog._id %>" class="btn-view">View</a>
+                  <a href="/blogs/<%= blog._id %>/edit" class="btn-edit">Edit</a>
+                  <button class="btn-delete" data-id="<%= blog._id %>">Delete</button>
+                </div>
+              </div>
+            <% }) %>
+          </div>
+        <% } else { %>
+          <div class="no-posts-message">
+            <p>You haven't published any posts yet.</p>
+            <a href="/new-post" class="btn-create-post-secondary">Create Your First Post</a>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <%- include('partials/footer') %>
+  </div>
+
+  <script>
+    // delete post functionality
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        if (!confirm('Are you sure you want to delete this post?')) return;
+        
+        const blogId = btn.getAttribute('data-id');
+        try {
+          const res = await fetch(`/blogs/${blogId}`, { method: 'DELETE' });
+          const data = await res.json();
+          if (data.redirect) window.location.href = data.redirect;
+        } catch (err) {
+          console.error('Error deleting blog:', err);
+          alert('Failed to delete post');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
