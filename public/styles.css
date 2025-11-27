@@ -364,6 +364,16 @@ nav ul li a:hover {
   z-index: 1000;
 }
 
+/* ensure the rounded dropdown clips children (prevents hover highlight from escaping) */
+.profile-menu {
+  overflow: hidden;
+}
+
+.profile-menu {
+  /* ensure contents are left-aligned and anchors can fill the width */
+  text-align: left;
+}
+
 .profile-menu.active {
   opacity: 1;
   visibility: visible;
@@ -430,30 +440,36 @@ nav ul li a:hover {
   margin: 0;
   display: flex;
   flex-direction: column;
+  align-items: stretch; 
 }
 
 .profile-menu-items li {
   margin: 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #f0f0f0; /* subtle separators like categories */
+  overflow: hidden; /* clip child transforms so hover highlight stays inside */
 }
-
 .profile-menu-items li:last-child {
+  margin-bottom: 0;
   border-bottom: none;
 }
 
 .profile-menu-items a {
   display: block;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem; /* match categories spacing */
   color: #222;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.95rem;
-  transition: background 0.15s ease, color 0.15s ease;
+  border-radius: 4px;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  box-sizing: border-box; /* ensure padding counts inside width */
+  width: 100%;
 }
 
 .profile-menu-items a:hover {
-  background: #f8f9fa;
-  color: #6b8cff;
+  background-color: #e7f1ff; /* same hover as categories */
+  color: #0056b3;
+  transform: translateX(8px); /* nudge using transform so highlight stays clipped */
 }
 
 .logout-link {
