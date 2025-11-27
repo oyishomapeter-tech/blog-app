@@ -437,7 +437,7 @@ nav ul li a:hover {
 .profile-menu-items {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 10px;
   display: flex;
   flex-direction: column;
   align-items: stretch; 
@@ -654,6 +654,7 @@ nav ul li a:hover {
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -741,7 +742,6 @@ nav ul li a:hover {
 .single:hover .blog-title {
   color: #007bff;
 }
-
 .blog-snippet {
   color: #666;
   font-size: 0.95rem;
@@ -749,10 +749,12 @@ nav ul li a:hover {
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   flex-grow: 1;
 }
+
 
 .single p:last-child {
   color: #999;
@@ -768,8 +770,8 @@ nav ul li a:hover {
   padding: 2rem;
   margin: 0;
 }
-
-Responsive Design
+ 
+/* Responsive Design */
 @media (max-width: 1024px) {
   .main-content {
     gap: 1.5rem;
@@ -1418,8 +1420,6 @@ Responsive Design
   color: #222;
   margin: 0;
   line-height: 1.4;
-}
-
 .profile-blog-snippet {
   font-size: 0.9rem;
   color: #666;
@@ -1427,8 +1427,11 @@ Responsive Design
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex-grow: 1;
+}
   flex-grow: 1;
 }
 
@@ -1552,7 +1555,7 @@ Responsive Design
   display: flex;
   flex-direction: column;
 }
-.card-image { height: 200px; }
+.card-content .blog-snippet { font-size: 0.95rem; -webkit-line-clamp: 3; line-clamp: 3; }
 .card-content { padding: 1.25rem; }
 .card-content .blog-title { font-size: 1.25rem; }
 .card-content .blog-snippet { font-size: 0.95rem; -webkit-line-clamp: 3; }
