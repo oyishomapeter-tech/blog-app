@@ -2,6 +2,7 @@ const express = require('express')
 require('dotenv').config()
 const mongoose = require('mongoose')
 const Blog = require('./models/blog')
+const User = require('./models/user')
 const authRoutes = require('./routes/authroutes')
 const cookie = require('cookie-parser')
 const {requireAuth, checkUser} = require('./middlewares/authmiddleware')
@@ -105,12 +106,14 @@ app.get('/blogs/:id', requireAuth, async (req, res) => {
   try {
     const blog = await Blog.findById(id).populate('author');
     if (!blog) {
-      return res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [] });
+      return res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '' });
     }
     const similarBlogs = await Blog.findSimilar(blog.tags, blog._id);
-    res.render('details', { blog, title: 'Blog Details', similarBlogs });
+    const articleUrl = `${req.protocol}://${req.get('host')}/blogs/${id}`;
+    res.render('details', { blog, title: 'Blog Details', similarBlogs, articleUrl });
   } catch (err) {
-    res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [] });
+    console.error(err);
+    res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '' });
   }
 });
 
@@ -145,11 +148,32 @@ app.get('/new-post', requireAuth, (req, res) => {
 app.get('/profile', requireAuth, async (req, res) => {
   try {
     const userId = res.locals.user._id;
+    console.log('Profile route: userId =', userId);
+    
+    // Fetch user data dynamically from database
+    const user = await User.findById(userId);
+    console.log('Fetched user from DB:', user);
+    
+    if (!user) {
+      return res.status(404).render('404', { title: '404 - User Not Found' });
+    }
+    
+    // Fetch user's blogs
     const userBlogs = await Blog.find({ author: userId }).sort({ createdAt: -1 }).populate('author');
-    res.render('profile', { title: 'My Profile', blogs: userBlogs });
+    
+    console.log('Rendering profile with user:', user.firstname, user.lastname);
+    res.render('profile', {
+      title: 'My Profile',
+      user: user,
+      blogs: userBlogs
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).render('profile', { title: 'My Profile', blogs: [] });
+    console.error('Profile route error:', err);
+    res.status(500).render('profile', {
+      title: 'My Profile',
+      user: res.locals.user || null,
+      blogs: []
+    });
   }
 });
 

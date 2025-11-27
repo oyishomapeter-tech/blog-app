@@ -4,18 +4,85 @@
 <body>
   <div class="page-wrapper">
     <div class="profile-container">
-      <!-- Profile Header Section -->
-      <div class="profile-header-section">
-        <div class="profile-card">
-          <div class="profile-avatar-large">
-            <%= (user.firstname.charAt(0) + (user.lastname ? user.lastname.charAt(0) : '')).toUpperCase() %>
+      <!-- Hero Section: Profile Image, Name, Member Since, Bio -->
+      <div class="profile-hero-section">
+        <div class="hero-background"></div>
+        <div class="hero-content">
+          <div class="hero-avatar">
+            <% 
+              const firstChar = user && user.firstname ? user.firstname.charAt(0) : '';
+              const lastChar = user && user.lastname ? user.lastname.charAt(0) : '';
+              const initials = (firstChar + lastChar).toUpperCase() || 'U';
+            %>
+            <%= initials %>
           </div>
-          <div class="profile-details">
-            <h1 class="profile-title"><%= user.firstname %> <%= user.lastname || '' %></h1>
-            <p class="profile-email-display"><%= user.email %></p>
-            <p class="profile-member-since">Member since <%= new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) %></p>
+          <div class="hero-info">
+            <h1 class="hero-name"><%= user.firstname %> <%= user.lastname || '' %></h1>
+            <p class="hero-email"><%= user.email %></p>
+            <p class="hero-member-since">Member since <strong><%= new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) %></strong></p>
+            <% if (user.bio) { %>
+              <p class="hero-bio"><%= user.bio %></p>
+            <% } %>
           </div>
-          <a href="/new-post" class="btn-create-post">Create New Post</a>
+          <a href="/profile/edit" class="btn-edit-profile">Edit Profile</a>
+        </div>
+      </div>
+
+      <!-- Stats Section: Posts, Followers, Following -->
+      <div class="profile-stats-section">
+        <div class="stat-card">
+          <div class="stat-number"><%= blogs && blogs.length || 0 %></div>
+          <div class="stat-label">Posts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number"><%= user.followers ? user.followers.length : 0 %></div>
+          <div class="stat-label">Followers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number"><%= user.following ? user.following.length : 0 %></div>
+          <div class="stat-label">Following</div>
+        </div>
+      </div>
+
+      <!-- Content Sections: Personal Info, About Me, My Posts -->
+      <div class="profile-content-sections">
+        <!-- Personal Information Section -->
+        <div class="profile-section">
+          <h2 class="section-title">Personal Information</h2>
+          <div class="section-content">
+            <div class="info-grid">
+              <div class="info-item">
+                <label>First Name</label>
+                <p><%= user.firstname %></p>
+              </div>
+              <div class="info-item">
+                <label>Last Name</label>
+                <p><%= user.lastname || 'Not provided' %></p>
+              </div>
+              <div class="info-item">
+                <label>Email</label>
+                <p><%= user.email %></p>
+              </div>
+              <div class="info-item">
+                <label>Member Since</label>
+                <p><%= new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></p>
+              </div>
+            </div>
+            <a href="/profile/edit" class="btn-edit-info">Edit Information</a>
+          </div>
+        </div>
+
+        <!-- About Me Section -->
+        <div class="profile-section">
+          <h2 class="section-title">About Me</h2>
+          <div class="section-content">
+            <% if (user.bio) { %>
+              <p class="about-text"><%= user.bio %></p>
+            <% } else { %>
+              <p class="about-empty">Tell us about yourself. <a href="/profile/edit">Add bio</a></p>
+            <% } %>
+            <a href="/profile/edit" class="btn-edit-about">Edit About</a>
+          </div>
         </div>
       </div>
 
