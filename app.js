@@ -13,8 +13,9 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.use(express.static('public'));
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
+// increase body parser limits to allow larger posts (e.g., long HTML or embedded base64 images)
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb', parameterLimit: 10000 }));
 app.use(cookie())
 
 // //connecting to mongodb
@@ -235,6 +236,20 @@ app.get('/profile', requireAuth, async (req, res) => {
 });
 
 app.use(authRoutes)
+
+// Friendly handler for payload-too-large errors and other body-parser errors
+app.use((err, req, res, next) => {
+  if (!err) return next();
+  // raw-body/body-parser sets status 413 or err.type === 'entity.too.large'
+  if (err.status === 413 || err.type === 'entity.too.large' || err.code === 'PAYLOAD_TOO_LARGE') {
+    console.warn('Payload too large:', req.originalUrl);
+    // render a friendly page if you have one, otherwise send JSON/text
+    if (req.accepts('html')) return res.status(413).render('404', { message: 'Request payload too large. Please reduce the size and try again.' });
+    return res.status(413).json({ error: 'Request payload too large. Please reduce the size and try again.' });
+  }
+  // delegate to default error handler if not handled
+  next(err);
+});
 
 app.use((req, res) => {
   res.status(404).render('404');
