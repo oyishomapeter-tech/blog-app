@@ -30,6 +30,12 @@
                   <%= new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
                 </p>
               </div>
+              <!-- Follow button: show only if viewing someone else's post -->
+              <% if (user && blog.author && user._id.toString() !== blog.author._id.toString()) { %>
+                <button class="btn-follow <% if (isFollowing) { %>following<% } %>" data-user-id="<%= blog.author._id %>" data-username="<%= blog.author.firstname %>">
+                  <span class="follow-text"><% if (isFollowing) { %>Following<% } else { %>Follow<% } %></span>
+                </button>
+              <% } %>
             </div>
             <div class="article-read-time">
               <span class="read-time-badge"><%= Math.ceil(blog.body.split(/\s+/).length / 200) %> min read</span>
@@ -392,6 +398,42 @@
         }
         originalCopy();
       };
+    })();
+
+    // Follow button handler
+    (function(){
+      const followBtn = document.querySelector('.btn-follow');
+      if (!followBtn) return;
+      const userId = followBtn.getAttribute('data-user-id');
+      const username = followBtn.getAttribute('data-username');
+      const followText = followBtn.querySelector('.follow-text');
+
+      followBtn.addEventListener('click', async (e) => {
+        try {
+          followBtn.disabled = true;
+          const res = await fetch(`/users/${userId}/follow`, { method: 'POST' });
+          const data = await res.json();
+          if (res.ok) {
+            // Toggle button state
+            if (data.following) {
+              followBtn.classList.add('following');
+              followText.textContent = 'Following';
+              showToast(`Following ${username}`);
+            } else {
+              followBtn.classList.remove('following');
+              followText.textContent = 'Follow';
+              showToast(`Unfollowed ${username}`);
+            }
+          } else {
+            showToast(data.error || 'Could not follow user', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Network error', 'error');
+        } finally {
+          followBtn.disabled = false;
+        }
+      });
     })();
   </script>
 </body>

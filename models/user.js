@@ -30,11 +30,15 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Please enter a password'], 
     minLength: [8, 'Password must be less than 8 characters']
-  }
-})
+  },
+  following: [{ type: Schema.Types.ObjectId, ref: 'user' }]
+}, { timestamps: true })
 
 //password hashing
 userSchema.pre('save', async function(next){
+  // Only hash if password has been modified
+  if (!this.isModified('password')) return next();
+  
   const salt = await bcrypt.genSalt(10)
   this.password = await bcrypt.hash(this.password, salt)
   next()

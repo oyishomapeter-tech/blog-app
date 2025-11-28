@@ -135,12 +135,19 @@
               <div class="card-content">
                 <h3 class="blog-title"><%= blog.title %></h3>
                 <p class="blog-snippet"><%= blog.snippet %></p>
-                <p class="blog-meta">By: <%= blog.author 
-                  && blog.author.firstname 
-                  && blog.author.lastname 
-                  ? blog.author.firstname + ' ' + blog.author.lastname 
-                  : 'Unknown' %>
-                </p>
+                <div class="card-footer">
+                  <div class="card-meta-row">
+                    <p class="blog-meta">By: <%= blog.author 
+                      && blog.author.firstname 
+                      && blog.author.lastname 
+                      ? blog.author.firstname + ' ' + blog.author.lastname 
+                      : 'Unknown' %>
+                    </p>
+                    <% if (user && blog.author && user._id.toString() !== blog.author._id.toString()) { %>
+                      <button class="btn-follow-card <% if (blog.isFollowing) { %>following<% } %>" data-user-id="<%= blog.author._id %>" data-username="<%= blog.author.firstname %>"><% if (blog.isFollowing) { %>Following<% } else { %>Follow<% } %></button>
+                    <% } %>
+                  </div>
+                </div>
                 <div class="card-stats">
                   <span class="stat likes">❤ <%= blog.likes ? blog.likes.length : 0 %></span>
                   <span class="stat comments">💬 <%= blog.comments ? blog.comments.length : 0 %></span>
@@ -166,8 +173,43 @@
       <% } %>
     </nav>
   <%- include('partials/footer') %>
-  </div> 
-  
+  </div>
+
+  <script>
+    // Follow button handler for blog cards
+    (function(){
+      const followBtns = document.querySelectorAll('.btn-follow-card');
+      followBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          try {
+            const userId = btn.getAttribute('data-user-id');
+            const username = btn.getAttribute('data-username');
+            btn.disabled = true;
+            const res = await fetch(`/users/${userId}/follow`, { method: 'POST' });
+            const data = await res.json();
+            if (res.ok) {
+              if (data.following) {
+                btn.classList.add('following');
+                btn.textContent = 'Following';
+              } else {
+                btn.classList.remove('following');
+                btn.textContent = 'Follow';
+              }
+            } else {
+              alert(data.error || 'Could not follow user');
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Network error');
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+    })();
+  </script>
   
 </body>
 </html>

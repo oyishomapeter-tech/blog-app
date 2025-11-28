@@ -79,8 +79,27 @@ app.get('/blogs', requireAuth, async (req, res)=> {
     ]);
 
     const totalPages = Math.max(1, Math.ceil(totalCount / limit));
+    
+    // Get current user's following list to set isFollowing state for each blog
+    let followingIds = [];
+    try {
+      const currentUser = await User.findById(res.locals.user._id);
+      if (currentUser && currentUser.following) {
+        followingIds = currentUser.following.map(id => id.toString());
+      }
+    } catch (userErr) {
+      console.error('Error fetching user follow state:', userErr);
+      // If user fetch fails, default to empty following list
+    }
+    
+    // Add isFollowing flag to each blog
+    const blogsWithFollowState = blogs.map(blog => {
+      const blogObj = blog.toObject ? blog.toObject() : blog;
+      blogObj.isFollowing = blog.author && followingIds.includes(blog.author._id.toString());
+      return blogObj;
+    });
 
-  res.render('index', { title: 'All Blogs', blogs, currentPage: page, totalPages, trendingBlogs, q });
+    res.render('index', { title: 'All Blogs', blogs: blogsWithFollowState, currentPage: page, totalPages, trendingBlogs, q });
   } catch (err) {
     console.error(err);
     res.status(500).render('index', { title: 'All Blogs', blogs: [], currentPage: 1, totalPages: 1, q: '' });
@@ -107,14 +126,27 @@ app.get('/blogs/:id', requireAuth, async (req, res) => {
   try {
     const blog = await Blog.findById(id).populate('author').populate('comments.author');
     if (!blog) {
-      return res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '' });
+      return res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '', isFollowing: false });
     }
     const similarBlogs = await Blog.findSimilar(blog.tags, blog._id);
     const articleUrl = `${req.protocol}://${req.get('host')}/blogs/${id}`;
-    res.render('details', { blog, title: 'Blog Details', similarBlogs, articleUrl });
+    
+    // Check if current user is following the blog author
+    let isFollowing = false;
+    try {
+      const currentUser = await User.findById(res.locals.user._id);
+      if (currentUser && currentUser.following) {
+        isFollowing = currentUser.following.some(id => id.equals(blog.author._id));
+      }
+    } catch (userErr) {
+      console.error('Error fetching user follow state:', userErr);
+      // If user fetch fails, default to false
+    }
+    
+    res.render('details', { blog, title: 'Blog Details', similarBlogs, articleUrl, isFollowing });
   } catch (err) {
     console.error(err);
-    res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '' });
+    res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '', isFollowing: false });
   }
 });
 
@@ -219,19 +251,68 @@ app.get('/profile', requireAuth, async (req, res) => {
     // Fetch user's blogs
     const userBlogs = await Blog.find({ author: userId }).sort({ createdAt: -1 }).populate('author');
     
+    // Count actual followers (users who have this user in their following array)
+    const followersCount = await User.countDocuments({ following: userId });
+    
     console.log('Rendering profile with user:', user.firstname, user.lastname);
     res.render('profile', {
       title: 'My Profile',
       user: user,
-      blogs: userBlogs
+      blogs: userBlogs,
+      followersCount: followersCount
     });
   } catch (err) {
     console.error('Profile route error:', err);
     res.status(500).render('profile', {
       title: 'My Profile',
       user: res.locals.user || null,
-      blogs: []
+      blogs: [],
+      followersCount: 0
     });
+  }
+});
+
+// Follow/Unfollow endpoints
+app.post('/users/:id/follow', requireAuth, async (req, res) => {
+  try {
+    const targetUserId = req.params.id;
+    const currentUserId = res.locals.user._id;
+
+    // Prevent user from following themselves
+    if (targetUserId === currentUserId.toString()) {
+      return res.status(400).json({ error: 'Cannot follow yourself' });
+    }
+
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser) return res.status(404).json({ error: 'User not found' });
+
+    const currentUser = await User.findById(currentUserId);
+    
+    // Check if already following
+    const isFollowing = currentUser.following.some(id => id.equals(targetUserId));
+    
+    if (isFollowing) {
+      // Unfollow
+      currentUser.following = currentUser.following.filter(id => !id.equals(targetUserId));
+    } else {
+      // Follow
+      currentUser.following.push(targetUserId);
+    }
+    
+    await currentUser.save();
+    
+    // Return updated follow state and follower count
+    const updatedTargetUser = await User.findById(targetUserId).populate('following');
+    const followersCount = await User.countDocuments({ following: targetUserId });
+    
+    res.json({ 
+      following: !isFollowing, 
+      followersCount: followersCount,
+      message: !isFollowing ? 'Following user' : 'Unfollowed user'
+    });
+  } catch (err) {
+    console.error('Follow error:', err);
+    res.status(500).json({ error: 'Failed to toggle follow' });
   }
 });
 

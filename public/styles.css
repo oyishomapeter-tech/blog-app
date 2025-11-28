@@ -2671,6 +2671,69 @@ nav ul li a {
   cursor: not-allowed;
 }
 
+/* Follow button styles */
+.btn-follow, .btn-follow-card {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(37, 117, 252, 0.18);
+}
+
+.btn-follow:hover:not(:disabled), .btn-follow-card:hover:not(:disabled) {
+  box-shadow: 0 6px 18px rgba(37, 117, 252, 0.24);
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+}
+
+.btn-follow.following, .btn-follow-card.following {
+  background: linear-gradient(135deg, #8e44ad, #3498db);
+  box-shadow: 0 4px 12px rgba(106, 161, 255, 0.18);
+}
+
+.btn-follow:disabled, .btn-follow-card:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Details page follow button in hero section */
+.btn-follow {
+  white-space: nowrap;
+}
+
+/* Index page card follow button */
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.card-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.card-meta-row .blog-meta {
+  flex: 1;
+  margin: 0;
+}
+
+.btn-follow-card {
+  flex-shrink: 0;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+
 /* Toast Notifications */
 .toast {
   position: fixed;
