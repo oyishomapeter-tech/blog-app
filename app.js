@@ -242,7 +242,6 @@ app.get('/profile', requireAuth, async (req, res) => {
     
     // Fetch user data dynamically from database
     const user = await User.findById(userId);
-    console.log('Fetched user from DB:', user);
     
     if (!user) {
       return res.status(404).render('404', { title: '404 - User Not Found' });
@@ -254,7 +253,6 @@ app.get('/profile', requireAuth, async (req, res) => {
     // Count actual followers (users who have this user in their following array)
     const followersCount = await User.countDocuments({ following: userId });
     
-    console.log('Rendering profile with user:', user.firstname, user.lastname);
     res.render('profile', {
       title: 'My Profile',
       user: user,
