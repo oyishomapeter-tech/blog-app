@@ -110,6 +110,11 @@
                   <h3 class="profile-blog-title"><%= blog.title %></h3>
                   <p class="profile-blog-snippet"><%= blog.snippet %></p>
                   <p class="profile-blog-date"><%= new Date(blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) %></p>
+                  <div class="profile-card-stats">
+                    <span class="stat likes">❤ <%= blog.likes ? blog.likes.length : 0 %></span>
+                    <span class="stat comments">💬 <%= blog.comments ? blog.comments.length : 0 %></span>
+                    <span class="stat shares">🔗 <%= blog.shares || 0 %></span>
+                  </div>
                 </div>
                 <div class="profile-card-actions">
                   <a href="/blogs/<%= blog._id %>" class="btn-view">View</a>

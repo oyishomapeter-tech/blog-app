@@ -65,6 +65,17 @@
 
           <!-- Article Footer -->
           <div class="article-footer">
+            <div class="engagement-bar">
+              <button class="btn-like" data-id="<%= blog._id %>">
+                <span class="like-icon">❤</span>
+                <span class="like-count"><%= blog.likes ? blog.likes.length : 0 %></span>
+              </button>
+              <button class="btn-comments-toggle">
+                💬 <span class="comments-count"><%= blog.comments ? blog.comments.length : 0 %></span>
+              </button>
+              <button class="btn-share" data-id="<%= blog._id %>">🔗 <span class="share-count"><%= blog.shares || 0 %></span></button>
+            </div>
+
             <div class="article-tags">
               <% if (blog.tags && blog.tags.length > 0) { %>
                 <h4>Tags</h4>
@@ -104,6 +115,33 @@
               <% if (user && blog.author && user._id.toString() === blog.author._id.toString()) { %>
                 <a href="/blogs/<%= blog._id %>/edit" class="btn-edit-article">Edit Article</a>
                 <button class="btn-delete-article" data-doc="<%= blog._id %>">Delete Article</button>
+              <% } %>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="comments-section" id="commentsSection">
+              <h4>Comments (<span id="commentsCount"><%= blog.comments ? blog.comments.length : 0 %></span>)</h4>
+              <div id="commentsList">
+                <% if (blog.comments && blog.comments.length > 0) { %>
+                  <% blog.comments.forEach(function(c){ %>
+                    <div class="comment-item">
+                      <div class="comment-author"><%= c.author ? (c.author.firstname + ' ' + (c.author.lastname || '')) : 'Anonymous' %></div>
+                      <div class="comment-body"><%= c.body %></div>
+                      <div class="comment-meta"><%= new Date(c.createdAt).toLocaleString() %></div>
+                    </div>
+                  <% }) %>
+                <% } else { %>
+                  <p class="no-comments">No comments yet. Be the first to comment!</p>
+                <% } %>
+              </div>
+
+              <% if (user) { %>
+                <form id="commentForm">
+                  <textarea name="body" id="commentBody" placeholder="Write a comment..." required></textarea>
+                  <button type="submit" class="btn-post-comment">Post Comment</button>
+                </form>
+              <% } else { %>
+                <p><a href="/login">Log in</a> to post a comment.</p>
               <% } %>
             </div>
           </div>
@@ -253,6 +291,108 @@
         setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
+
+    // Like button handler
+    (function(){
+      const likeBtn = document.querySelector('.btn-like');
+      if (!likeBtn) return;
+      const blogId = likeBtn.getAttribute('data-id');
+      const likeCountEl = likeBtn.querySelector('.like-count');
+      likeBtn.addEventListener('click', async () => {
+        try {
+          likeBtn.disabled = true;
+          const res = await fetch(`/blogs/${blogId}/like`, { method: 'POST' });
+          const data = await res.json();
+          if (res.ok) {
+            likeCountEl.textContent = data.likesCount;
+            if (data.liked) likeBtn.classList.add('liked'); else likeBtn.classList.remove('liked');
+          } else {
+            showToast(data.error || 'Could not like post', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Network error', 'error');
+        } finally {
+          likeBtn.disabled = false;
+        }
+      });
+    })();
+
+    // Comment form handler
+    (function(){
+      const commentForm = document.getElementById('commentForm');
+      if (!commentForm) return;
+      const commentsList = document.getElementById('commentsList');
+      const commentsCount = document.getElementById('commentsCount');
+      const commentBody = document.getElementById('commentBody');
+      const blogId = '<%= blog._id %>';
+      commentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const body = commentBody.value.trim();
+        if (!body) return;
+        try {
+          const res = await fetch(`/blogs/${blogId}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ body })
+          });
+          const data = await res.json();
+          if (res.ok) {
+            // prepend comment
+            const c = data.comment;
+            const div = document.createElement('div');
+            div.className = 'comment-item';
+            div.innerHTML = `<div class="comment-author">${c.author ? (c.author.firstname + ' ' + (c.author.lastname || '')) : 'Anonymous'}</div><div class="comment-body">${c.body}</div><div class="comment-meta">${new Date(c.createdAt).toLocaleString()}</div>`;
+            // remove 'no comments' placeholder if present
+            const placeholder = commentsList.querySelector('.no-comments');
+            if (placeholder) placeholder.remove();
+            commentsList.insertBefore(div, commentsList.firstChild);
+            // update counts
+            const count = data.commentsCount;
+            commentsCount.textContent = count;
+            const commentsCountEls = document.querySelectorAll('.comments-count');
+            commentsCountEls.forEach(el => el.textContent = count);
+            commentBody.value = '';
+            showToast('Comment posted');
+          } else {
+            showToast(data.error || 'Failed to post comment', 'error');
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Network error', 'error');
+        }
+      });
+    })();
+
+    // Share buttons: increment share count before opening
+    (function(){
+      const shareBtns = document.querySelectorAll('.share-btn');
+      const shareCountEl = document.querySelector('.share-count');
+      const blogId = '<%= blog._id %>';
+      shareBtns.forEach(btn => {
+        if (btn.tagName.toLowerCase() === 'a') {
+          btn.addEventListener('click', async (e) => {
+            try {
+              // increment share count (fire-and-forget)
+              await fetch(`/blogs/${blogId}/share`, { method: 'POST' });
+            } catch (err) {
+              // ignore
+            }
+          });
+        }
+      });
+
+      // overwrite copyToClipboard to also increment share count
+      const originalCopy = copyToClipboard;
+      window.copyToClipboard = async function() {
+        try {
+          await fetch(`/blogs/${blogId}/share`, { method: 'POST' });
+        } catch (err) {
+          // ignore
+        }
+        originalCopy();
+      };
+    })();
   </script>
 </body>
 </html>

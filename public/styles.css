@@ -785,6 +785,51 @@ nav ul li a:hover {
   }
 }
 
+
+/* Social interactions & comments styling */
+.engagement-bar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.engagement-bar .btn-like,
+.engagement-bar .btn-comments-toggle,
+.engagement-bar .btn-share {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+.engagement-bar .btn-like.liked { color: #e74c3c; }
+.card-stats, .profile-card-stats {
+  display: flex;
+  gap: 0.8rem;
+  color: #666;
+  font-size: 0.95rem;
+  margin-top: 0.6rem;
+}
+.card-stats .stat, .profile-card-stats .stat { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+.comments-section { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px dashed #eee; }
+.comments-section h4 { margin: 0 0 0.8rem 0; }
+.comment-item { padding: 0.75rem 0; border-bottom: 1px solid #f2f2f2; }
+.comment-item .comment-author { font-weight: 700; color: #222; margin-bottom: 0.35rem; }
+.comment-item .comment-body { color: #333; margin-bottom: 0.35rem; }
+.comment-item .comment-meta { color: #999; font-size: 0.85rem; }
+.no-comments { color: #777; font-style: italic; }
+.comments-section #commentBody { width: 100%; min-height: 80px; padding: 0.6rem; border-radius: 8px; border: 1px solid #e8e8e8; resize: vertical; }
+.btn-post-comment { margin-top: 0.5rem; padding: 0.5rem 0.9rem; background: #2575fc; color: #fff; border: none; border-radius: 8px; cursor: pointer; }
+
+/* small responsive tweaks */
+@media (max-width: 768px) {
+  .card-stats, .profile-card-stats { gap: 0.6rem; font-size: 0.9rem; }
+}
 @media (max-width: 768px) {
   .main-content {
     flex-direction: column;

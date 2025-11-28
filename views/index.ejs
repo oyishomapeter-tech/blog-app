@@ -141,6 +141,11 @@
                   ? blog.author.firstname + ' ' + blog.author.lastname 
                   : 'Unknown' %>
                 </p>
+                <div class="card-stats">
+                  <span class="stat likes">❤ <%= blog.likes ? blog.likes.length : 0 %></span>
+                  <span class="stat comments">💬 <%= blog.comments ? blog.comments.length : 0 %></span>
+                  <span class="stat shares">🔗 <%= blog.shares || 0 %></span>
+                </div>
               </div>
             </a>
           <% }) %>

@@ -104,7 +104,7 @@ app.post('/blogs', requireAuth, async (req,res)=>{
 app.get('/blogs/:id', requireAuth, async (req, res) => {
   const id = req.params.id;
   try {
-    const blog = await Blog.findById(id).populate('author');
+    const blog = await Blog.findById(id).populate('author').populate('comments.author');
     if (!blog) {
       return res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '' });
     }
@@ -114,6 +114,63 @@ app.get('/blogs/:id', requireAuth, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.render('details', { blog: null, title: 'Blog Details', similarBlogs: [], articleUrl: '' });
+  }
+});
+
+// Like (toggle)
+app.post('/blogs/:id/like', requireAuth, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: 'Blog not found' });
+    const userId = res.locals.user._id;
+    const idx = blog.likes.findIndex(l => l.equals(userId));
+    let liked = false;
+    if (idx === -1) {
+      blog.likes.push(userId);
+      liked = true;
+    } else {
+      blog.likes.splice(idx, 1);
+      liked = false;
+    }
+    await blog.save();
+    res.json({ liked, likesCount: blog.likes.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to toggle like' });
+  }
+});
+
+// Add a comment
+app.post('/blogs/:id/comments', requireAuth, async (req, res) => {
+  try {
+    const { body } = req.body;
+    if (!body || !body.trim()) return res.status(400).json({ error: 'Comment body required' });
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: 'Blog not found' });
+    const comment = { author: res.locals.user._id, body: body.trim() };
+    blog.comments.unshift(comment);
+    await blog.save();
+    // populate the newly added comment's author for response
+    const populatedBlog = await Blog.findById(blog._id).populate('comments.author');
+    const newComment = populatedBlog.comments[0];
+    res.json({ comment: newComment, commentsCount: populatedBlog.comments.length });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add comment' });
+  }
+});
+
+// Increment share count
+app.post('/blogs/:id/share', async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) return res.status(404).json({ error: 'Blog not found' });
+    blog.shares = (blog.shares || 0) + 1;
+    await blog.save();
+    res.json({ shares: blog.shares });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to increment share count' });
   }
 });
 

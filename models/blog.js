@@ -24,7 +24,14 @@ const blogSchema = new Schema({
     type: Schema.Types.ObjectId, 
     ref: 'user', required: true 
   },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  likes: [{ type: Schema.Types.ObjectId, ref: 'user' }],
+  comments: [{
+    author: { type: Schema.Types.ObjectId, ref: 'user' },
+    body: { type: String },
+    createdAt: { type: Date, default: Date.now }
+  }],
+  shares: { type: Number, default: 0 }
 }, {timestamps: true})
 
 
